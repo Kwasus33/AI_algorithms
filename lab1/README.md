@@ -13,9 +13,11 @@ Znana jest funkcja celu
     
     $y \in{(-2, 2)}$
 
-Zaimplementować algorytm spadku wzdłuż gradientu opisany na wykładzie.
+Gdzie A, B, C to kolejne dodatnie cyfry numeru indeksu poczynając od jego końca. Np. dla 321037 A=7, B=3, C=1
 
-Użyć zaimplementowanego algorytmu do wyznaczenia ekstremów funkcji.
+Zaimplementować metodę gradientu prostego opisaną na wykładzie.
+
+Użyć zaimplementowany algorytm do wyznaczenia ekstremów funkcji.
 
 Zbadać wpływ następujących parametrów na proces optymalizacji:
  - długość kroku uczącego
