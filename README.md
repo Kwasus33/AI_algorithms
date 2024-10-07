@@ -63,6 +63,7 @@ wskazane jest korzystać z formatterów kodu np. https://github.com/psf/black
  - Parametry algorytmu podawać używając plików (.json, .yaml...), lub, jeśli jest ich niewiele, używając modułu `argparse`.
 Nie należy w tym celu używać magicznych stałych, ani zmiennych globalnych.
  - Im kod jest krótszy, tym, zazwyczaj, lepiej
+ - Kod (nazwy zmiennych, plików, komentarze) piszemy po angielsku 
 
 ## Sugerowana struktura rozwiązania
 
@@ -86,6 +87,9 @@ Nie należy w tym celu używać magicznych stałych, ani zmiennych globalnych.
  - Proszę przeczytać sekcję *Uwagi* ze strony wykładowcy [https://staff.elka.pw.edu.pl/~rbiedrzy/WSI_CW/index.html](https://staff.elka.pw.edu.pl/~rbiedrzy/WSI_CW/index.html)
  - Tabele i wykresy muszą być przedstawione w formie łatwo zrozumiałej (np. wszystkie osie na wykresach powinny być podpisane)
  - Nie trzeba dokumentować kodu
+ - W opisach tabel/wykresów oprócz wizualizowanej wartości zmiennych badanych należy też umieścić informacje o wartościach parametrów,
+które są ustalone dla danego eksperymentu 
+ - Sprawozdanie można pisać w języku polskim lub angielskim
 
 ## Sugerowana zawartość sprawozdania
 
