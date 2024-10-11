@@ -38,10 +38,10 @@ Ewentualne pytania o pojawienie się oceny w USOSie można zadawać dopiero po t
  - Ćwiczenia można oddawać tydzień wcześniej - w terminach konsultacji. W tym przypadku nie trzeba rezerwować terminu oddania.
  - Student powinien przygotować jedno repozytorium na wszystkie ćwiczenia z WSI.
 Struktura przykładowego repozytorium znajduje się na [https://gitlab-stud.elka.pw.edu.pl/bolber/wsi-template.git](https://gitlab-stud.elka.pw.edu.pl/bolber/wsi-template.git). Można zrobić fork, lub kopię tego repozytorium.
-Przykładowe repozytorium może ulegać modyfikacjom w trakcie semestru, przed rozpoczęciem danego tematu ćwiczeń.
- - Prowadzący powinien być dodany w tym repozytorium z uprawnieniem do
+Przykładowe repozytorium może ulegać modyfikacjom w trakcie semestru, w szczególności przed rozpoczęciem kolejnego tematu ćwiczeń.
+ - Prowadzący powinien być dodany w repozytorium studenta z uprawnieniem do
 komentowania merge requestów. Na każde zadanie należy utworzyć brancha.
-W ramach oddawania należy utworzyć merge request brancha zadania do
+W ramach oddawania zadania należy utworzyć merge request brancha zadania do
 głównego brancha.
  - Branche i merge requesty należy nazywać krótkimi nazwami umożliwiającymi łatwą identyfikację zadania np. lab1, lab2 etc. 
 
