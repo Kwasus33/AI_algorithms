@@ -55,12 +55,13 @@ np. numpy, pandas, matplotlib. Użyte pakiety należy wypisać wraz z wersją w 
     ```shell
     python3 -m venv venv
     source venv/bin/activate
+    pip install -r requirements.txt
     python nazwa_skryptu argumenty
     ```
  - Nie jest dozwolone wykorzystywać gotowych funkcji implementujących temat ćwiczenia
  - Czystość, czytelność kodu oraz raportu wpływa na ocenę ćwiczenia, 
 wskazane jest korzystać z formatterów kodu np. https://github.com/psf/black
- - Parametry algorytmu podawać używając plików (.json, .yaml...), lub, jeśli jest ich niewiele, używając modułu `argparse`.
+ - Parametry algorytmu podawać używając plików konfiguracyjnych (.json, .yaml...), lub, jeśli jest ich niewiele, jako argumenty wywołania skryptu (argparse).
 Nie należy w tym celu używać magicznych stałych, ani zmiennych globalnych.
  - Im kod jest krótszy, tym, zazwyczaj, lepiej
  - Kod (nazwy zmiennych, plików, komentarze) piszemy po angielsku 
