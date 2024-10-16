@@ -3,22 +3,30 @@
 
 import argparse
 import random
+import copy
 import numpy as np
 import matplotlib.pyplot as plt
 
 class GradientDescent:
     def __init__(self, points, learning_rate, num_iterations, function_grad):
-        self.points = np.array(points)
+        self.points = points
         self.learning_rate = learning_rate
         self.num_iterations = num_iterations
         self.function_grad = function_grad
 
     def grad_descent(self):
-        trajectory = [self.points.copy()]
+        desc_points = np.array(self.points.copy())
+        asc_points = np.array(self.points.copy())
+        desc_trajectory = [desc_points.copy()]
+        asc_trajectory = [asc_points.copy()]
+
         for _ in range(self.num_iterations):
-            self.points = self.points - self.learning_rate * self.function_grad(self.points)
-            trajectory.append(self.points.copy())
-        return np.array(trajectory)
+            desc_points = desc_points - self.learning_rate * self.function_grad(desc_points)
+            asc_points = asc_points + self.learning_rate * self.function_grad(asc_points)
+            desc_trajectory.append(desc_points.copy())
+            asc_trajectory.append(asc_points.copy())
+
+        return (np.array(desc_trajectory), np.array(asc_trajectory))
 
 class Function_f:
     def __init__(self):
@@ -58,32 +66,72 @@ class DataVisualizer:
         plt.ylabel('Y')
         
         plt.plot(X, Y)
+
+        desc_trajectory_args, asc_trajectory_args = trajectory_args
+        desc_trajectory_values, asc_trajectory_values = trajectory_values
+
         plt.plot(
-            trajectory_args, trajectory_values,
-            color='red', linestyle='-', marker='o', label='Trajectory'
+            desc_trajectory_args, desc_trajectory_values,
+            color='red', linestyle='-', marker='o', label='Trajectory descending'
+        )
+        plt.plot(
+            asc_trajectory_args, asc_trajectory_values,
+            color='orange', linestyle='-', marker='*', label='Trajectory ascending'
         )
 
         plt.legend()
         plt.grid(True)
         
         plt.show()
-    
+
     def Visualize_3D(self, X, Y, Z, trajectory_args, trajectory_values):
         fig = plt.figure(figsize=(10, 10))
         ax = fig.add_subplot(projection='3d')
+        ax.plot_surface(X, Y, Z, cmap='inferno')
+
+        desc_trajectory_args, asc_trajectory_args = trajectory_args
+        desc_trajectory_values, asc_trajectory_values = trajectory_values
+
+        ax.plot(
+            desc_trajectory_args[:, 0], desc_trajectory_args[:, 1], desc_trajectory_values,
+            color='green', linestyle='--', marker='*', label='Trajectory descending'
+        )
+        ax.plot(
+            asc_trajectory_args[:, 0], asc_trajectory_args[:, 1], asc_trajectory_values,
+            color='blue', linestyle='-', marker='o', label='Trajectory ascending'
+        )
 
         ax.set_title('G(x) plot')
         ax.set_xlabel('X')
         ax.set_ylabel('Y')
         ax.set_zlabel('G(X, Y)')
 
-        ax.plot(
-            trajectory_args[:, 0], trajectory_args[:, 1], trajectory_values,
-            color='green', linestyle='-', marker='o', label='Trajectory'
-        )
-        ax.plot_surface(X, Y, Z, cmap='inferno')
-
         plt.legend()
+        plt.show()
+
+    
+    def Visualize_3D_subplots(self, X, Y, Z, trajectory_args, trajectory_values):
+        fig, (ax1, ax2) = plt.subplots(1, 2, subplot_kw={'projection': '3d'}, figsize=(10, 10))
+        ax1.plot_surface(X, Y, Z, cmap='inferno'), ax2.plot_surface(X, Y, Z, cmap='inferno')
+
+        desc_trajectory_args, asc_trajectory_args = trajectory_args
+        desc_trajectory_values, asc_trajectory_values = trajectory_values
+
+        ax1.plot(
+            desc_trajectory_args[:, 0], desc_trajectory_args[:, 1], desc_trajectory_values,
+            color='green', linestyle='--', marker='*', label='Trajectory descending'
+        )
+        ax2.plot(
+            asc_trajectory_args[:, 0], asc_trajectory_args[:, 1], asc_trajectory_values,
+            color='blue', linestyle='-', marker='o', label='Trajectory ascending'
+        )
+
+        ax1.set_title('G(x) plot'), ax2.set_title('G(x) plot')
+        ax1.set_xlabel('X'), ax2.set_xlabel('X')
+        ax1.set_ylabel('Y'), ax2.set_ylabel('Y')
+        ax1.set_zlabel('G(X, Y)'), ax2.set_zlabel('G(X, Y)')
+
+        plt.tight_layout()
         plt.show()
 
 
@@ -106,8 +154,13 @@ if __name__ == "__main__":
         ]
         func = Function_g()
 
-    trajectory_args = GradientDescent(points, 0.1, 10000, func.gradient).grad_descent()
-    trajectory_values = np.array([func.formula(coords) for coords in trajectory_args])
+    desc_trajectory_args, asc_trajectory_args = GradientDescent(points, 0.1, 10000, func.gradient).grad_descent()
+
+    desc_trajectory_values = np.array([func.formula(coords) for coords in desc_trajectory_args])
+    asc_trajectory_values = np.array([func.formula(coords) for coords in asc_trajectory_args])
+
+    trajectory_args = (desc_trajectory_args, asc_trajectory_args)
+    trajectory_values = (desc_trajectory_values, asc_trajectory_values)
 
     plotter = DataVisualizer()
 
@@ -122,3 +175,4 @@ if __name__ == "__main__":
         X, Y = np.meshgrid(g_x, g_y)
         Z = func.formula([X, Y])
         plotter.Visualize_3D(X, Y, Z, trajectory_args, trajectory_values)
+        # plotter.Visualize_3D_subplots(X, Y, Z, trajectory_args, trajectory_values)
