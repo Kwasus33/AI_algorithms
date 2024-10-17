@@ -3,18 +3,18 @@
 
 import argparse
 import random
-import copy
+import typing
 import numpy as np
 import matplotlib.pyplot as plt
 
 class GradientDescent:
-    def __init__(self, points, learning_rate, num_iterations, function_grad):
+    def __init__(self, points: list, learning_rate: float, num_iterations: int, function_grad: classmethod) -> None:
         self.points = points
         self.learning_rate = learning_rate
         self.num_iterations = num_iterations
         self.function_grad = function_grad
 
-    def grad_descent(self):
+    def grad_descent(self) -> typing.Tuple[np.array, np.array]:
         desc_points = np.array(self.points.copy())
         asc_points = np.array(self.points.copy())
         desc_trajectory = [desc_points.copy()]
@@ -29,25 +29,25 @@ class GradientDescent:
         return (np.array(desc_trajectory), np.array(asc_trajectory))
 
 class Function_f:
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
-    def formula(self, x):
+    def formula(self, x: np.array) -> float:
         return 6*x + 9*np.sin(x)
 
-    def gradient(self, x):
+    def gradient(self, x: np.array) -> np.array:
         # x is already a NumPy array so is the return value
         return 6 - 9*np.cos(x)
 
 class Function_g:
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
-    def formula(self, points):
+    def formula(self, points: np.array) -> float:
         x, y = points
         return 3*x*y / (np.exp(x**2 + y**2))
 
-    def gradient(self, points):
+    def gradient(self, points: np.array) -> np.array:
         x, y = points
         return np.array([
             (3*y - 6*x**2*y) / (np.exp(x**2 + y**2)),
@@ -159,6 +159,16 @@ if __name__ == "__main__":
     desc_trajectory_values = np.array([func.formula(coords) for coords in desc_trajectory_args])
     asc_trajectory_values = np.array([func.formula(coords) for coords in asc_trajectory_args])
 
+    condition = 'g' if args.function == 'g' else 'f'
+
+    print(
+        f"Function {condition} has minimum ({desc_trajectory_args[-1]}, {desc_trajectory_values[-1]})"
+    )
+    
+    print(
+        f"Function {condition} has maximum ({asc_trajectory_args[-1]}, {asc_trajectory_values[-1]})"
+    )
+
     trajectory_args = (desc_trajectory_args, asc_trajectory_args)
     trajectory_values = (desc_trajectory_values, asc_trajectory_values)
 
@@ -170,9 +180,9 @@ if __name__ == "__main__":
         plotter.Visualize_2D(X, Y, trajectory_args, trajectory_values)
 
     elif args.function == 'g':
-        g_x = np.linspace(-2, 2)
-        g_y = np.linspace(-2, 2)
-        X, Y = np.meshgrid(g_x, g_y)
+        X = np.linspace(-2, 2)
+        Y = np.linspace(-2, 2)
+        X, Y = np.meshgrid(X, Y)
         Z = func.formula([X, Y])
         plotter.Visualize_3D(X, Y, Z, trajectory_args, trajectory_values)
         # plotter.Visualize_3D_subplots(X, Y, Z, trajectory_args, trajectory_values)
