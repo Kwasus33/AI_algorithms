@@ -3,7 +3,6 @@
 
 import argparse
 import random
-import typing
 import numpy as np
 import matplotlib.pyplot as plt
 
