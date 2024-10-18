@@ -46,7 +46,7 @@ class Function_f:
         return 6*x + 9*np.sin(x)
 
     def gradient(self, x: np.array) -> np.array:
-        return 6 - 9*np.cos(x)
+        return 6 + 9*np.cos(x)
 
     def isInDomain(self, x: np.array) -> bool:
         return -4*np.pi <= x <= 4*np.pi
