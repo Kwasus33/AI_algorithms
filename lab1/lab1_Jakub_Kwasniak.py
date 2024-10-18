@@ -8,25 +8,35 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 class GradientDescent:
-    def __init__(self, points: list, learning_rate: float, num_iterations: int, function_grad: classmethod) -> None:
-        self.points = points
+    def __init__(self, point: list, learning_rate: float, num_iterations: int, function_grad: classmethod) -> None:
+        self.point = point
         self.learning_rate = learning_rate
         self.num_iterations = num_iterations
         self.function_grad = function_grad
 
-    def grad_descent(self) -> typing.Tuple[np.array, np.array]:
-        desc_points = np.array(self.points.copy())
-        asc_points = np.array(self.points.copy())
-        desc_trajectory = [desc_points.copy()]
-        asc_trajectory = [asc_points.copy()]
+    def grad_descent(self, isInDomain: classmethod) -> np.array:
+        desc_point = np.array(self.point.copy())
+        desc_trajectory = [desc_point.copy()]
+    
+        for _ in range(self.num_iterations):
+            desc_point = desc_point - self.learning_rate * self.function_grad(desc_point)
+            if not isInDomain(desc_point):
+                return np.array(desc_trajectory)
+            desc_trajectory.append(desc_point.copy())
+            
+        return np.array(desc_trajectory)
+    
+    def grad_ascent(self, isInDomain: classmethod) -> np.array:
+        asc_point = np.array(self.point.copy())
+        asc_trajectory = [asc_point.copy()]
 
         for _ in range(self.num_iterations):
-            desc_points = desc_points - self.learning_rate * self.function_grad(desc_points)
-            asc_points = asc_points + self.learning_rate * self.function_grad(asc_points)
-            desc_trajectory.append(desc_points.copy())
-            asc_trajectory.append(asc_points.copy())
-
-        return (np.array(desc_trajectory), np.array(asc_trajectory))
+            asc_point = asc_point + self.learning_rate * self.function_grad(asc_point)
+            if not isInDomain(asc_point):
+                return np.array(asc_trajectory)
+            asc_trajectory.append(asc_point.copy())
+            
+        return np.array(asc_trajectory)
 
 class Function_f:
     def __init__(self) -> None:
@@ -36,23 +46,28 @@ class Function_f:
         return 6*x + 9*np.sin(x)
 
     def gradient(self, x: np.array) -> np.array:
-        # x is already a NumPy array so is the return value
         return 6 - 9*np.cos(x)
+
+    def isInDomain(self, x: np.array) -> bool:
+        return -4*np.pi <= x <= 4*np.pi
 
 class Function_g:
     def __init__(self) -> None:
         pass
 
-    def formula(self, points: np.array) -> float:
-        x, y = points
+    def formula(self, point: np.array) -> float:
+        x, y = point
         return 3*x*y / (np.exp(x**2 + y**2))
 
-    def gradient(self, points: np.array) -> np.array:
-        x, y = points
+    def gradient(self, point: np.array) -> np.array:
+        x, y = point
         return np.array([
             (3*y - 6*x**2*y) / (np.exp(x**2 + y**2)),
             (3*x - 6*x*y**2) / (np.exp(x**2 + y**2))
         ])
+    def isInDomain(self, point: np.array) -> bool:
+        x, y = point
+        return -2 <= x <= 2 and -2 <= y <= 2
     
 class DataVisualizer:
     def __init__(self):
@@ -144,17 +159,22 @@ if __name__ == "__main__":
     eps = 1e-10
 
     if args.function == 'f':
-        points = [random.uniform(-4*np.pi + eps, 4*np.pi - eps)]
+        point = [random.uniform(-4*np.pi + eps, 4*np.pi - eps)]
         func = Function_f()
     
     elif args.function == 'g':
-        points = [
+        point = [
             random.uniform(-2 + eps, 2 - eps),
-            random.uniform(-2 + eps, 2 - eps)
+            random.uniform(-2 + eps, 2 - eps),
         ]
         func = Function_g()
 
-    desc_trajectory_args, asc_trajectory_args = GradientDescent(points, 0.1, 10000, func.gradient).grad_descent()
+    print("Starting point: ", point)
+
+    desc_trajectory_args = GradientDescent(
+        point, 0.01, 1000, func.gradient).grad_descent(func.isInDomain)
+    asc_trajectory_args = GradientDescent(
+        point, 0.01, 1000, func.gradient).grad_ascent(func.isInDomain)
 
     desc_trajectory_values = np.array([func.formula(coords) for coords in desc_trajectory_args])
     asc_trajectory_values = np.array([func.formula(coords) for coords in asc_trajectory_args])
