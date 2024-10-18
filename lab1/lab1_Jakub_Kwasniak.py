@@ -154,9 +154,13 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--function', type=str, choices=['f', 'g'], default='f', help='Choose function f or g')
+    parser.add_argument('-a', '--alpha', type=float, default=0.1, help='Insert learning rate')
+    parser.add_argument('-l', '--limit', type=int, default=1000, help='Insert iterations limit')
     args = parser.parse_args()
 
     eps = 1e-10
+    learning_rate = args.alpha
+    iterations_limit = args.limit
 
     if args.function == 'f':
         point = [random.uniform(-4*np.pi + eps, 4*np.pi - eps)]
@@ -172,9 +176,9 @@ if __name__ == "__main__":
     print("Starting point: ", point)
 
     desc_trajectory_args = GradientDescent(
-        point, 0.01, 1000, func.gradient).grad_descent(func.isInDomain)
+        point, learning_rate, iterations_limit, func.gradient).grad_descent(func.isInDomain)
     asc_trajectory_args = GradientDescent(
-        point, 0.01, 1000, func.gradient).grad_ascent(func.isInDomain)
+        point, learning_rate, iterations_limit, func.gradient).grad_ascent(func.isInDomain)
 
     desc_trajectory_values = np.array([func.formula(coords) for coords in desc_trajectory_args])
     asc_trajectory_values = np.array([func.formula(coords) for coords in asc_trajectory_args])
