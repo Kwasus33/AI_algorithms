@@ -24,18 +24,7 @@ class GradientDescent:
             desc_trajectory.append(desc_point.copy())
             
         return np.array(desc_trajectory)
-    
-    def grad_ascent(self, isInDomain: classmethod) -> np.array:
-        asc_point = np.array(self.point.copy())
-        asc_trajectory = [asc_point.copy()]
 
-        for _ in range(self.num_iterations):
-            asc_point = asc_point + self.learning_rate * self.function_grad(asc_point)
-            if not isInDomain(asc_point):
-                return np.array(asc_trajectory)
-            asc_trajectory.append(asc_point.copy())
-            
-        return np.array(asc_trajectory)
 
 class Function_f:
     def __init__(self) -> None:
@@ -177,7 +166,7 @@ if __name__ == "__main__":
     desc_trajectory_args = GradientDescent(
         point, learning_rate, iterations_limit, func.gradient).grad_descent(func.isInDomain)
     asc_trajectory_args = GradientDescent(
-        point, learning_rate, iterations_limit, func.gradient).grad_ascent(func.isInDomain)
+        point, -learning_rate, iterations_limit, func.gradient).grad_descent(func.isInDomain)
 
     desc_trajectory_values = np.array([func.formula(coords) for coords in desc_trajectory_args])
     asc_trajectory_values = np.array([func.formula(coords) for coords in asc_trajectory_args])
