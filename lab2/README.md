@@ -2,7 +2,7 @@
 
 ## Treść polecenia
 
-Zaimplementować algorytm genetyczny z mutacją, selekcją ruletkową, krzyżowaniem oraz sukcesją generacyjną.
+Zaimplementować algorytm ewolucyjny z mutacją, selekcją ruletkową, krzyżowaniem oraz sukcesją generacyjną.
 
 Użyć zaimplementowany algorytm do wyznaczenia najbliższej trasy w
 problemie komiwojażera na zbiorze polskich miast (`data/cities.csv`).
