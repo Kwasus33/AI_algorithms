@@ -17,6 +17,7 @@ def evaluate_solution(cities_matrix, solution):
     total_distance = 0
     for city_id in range(len(solution) - 1):
         total_distance += cities_matrix.iloc[solution[city_id], solution[city_id + 1]]
+        #  adds to total distance matix value of distance between two cities appearing next to each other in solution
     return total_distance
 
 

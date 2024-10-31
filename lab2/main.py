@@ -3,7 +3,7 @@ import pathlib
 
 import numpy as np
 import pandas as pd
-from solution_utils import generate_solution
+from solution_utils import generate_solution, decode_solution
 
 MINI_CITIES_NUM = 5
 
@@ -32,6 +32,7 @@ def load_data(args):
         )
     else:
         city_names = [args.start] + data_without_start_and_finish.index.tolist() + [args.finish]
+        # .index gives data frame 'data' column indexes, .tolist() converts them to list
 
     return data[city_names].loc[city_names]
 
@@ -42,7 +43,10 @@ def main():
         np.random.seed(args.seed)
 
     data = load_data(args)
-    print(generate_solution(data))
+    print(data)
+    solution = generate_solution(data)
+    print(solution)
+    print(decode_solution(data, solution))
 
 
 if __name__ == "__main__":
