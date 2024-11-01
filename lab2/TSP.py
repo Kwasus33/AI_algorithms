@@ -1,6 +1,6 @@
 import numpy as np
 from solution_utils import evaluate_solution, generate_solution, validate_solution
-POP_SIZE = 100
+POP_SIZE = 1000
 
 
 class Route:
@@ -11,14 +11,14 @@ class Route:
 class TSP:
     def __init__(self, data):
         self.data = data
-        self.population = np.array([])
+        self.population = [None]*POP_SIZE
         self.best_solution = None
 
     def generate_population(self):
         for _ in range(POP_SIZE):
             solution = generate_solution(self.data)
             fitness = evaluate_solution(self.data, solution)
-            self.population.append(Route(solution, fitness))
+            self.population[_] = Route(solution, fitness)
 
     def rulete_selection(self, fitness_sum):
         total_prob = 0
@@ -29,6 +29,7 @@ class TSP:
                 return individual
             
     def crossover(self, parent1, parent2):
+        # solution = [None]*len(parent1.solution)
         key = np.random.randint(1, len(parent1.solution)-1)
         solution = parent1.solution.copy()[:key]
         for param in parent2.solution.copy()[:-1]:
@@ -38,19 +39,15 @@ class TSP:
         validate_solution(self.data, solution)
         return Route(solution, evaluate_solution(self.data, solution))
 
-
-
     def generational_succession(self):
-        new_population = np.array([])
+        new_population = [None]*POP_SIZE
         fitness_sum = sum(individual.fitness for individual in self.population)
         for _ in range(POP_SIZE):
             parent1 = self.rulete_selection(fitness_sum)
             parent2 = self.rulete_selection(fitness_sum)
             child = self.crossover(parent1, parent2)
-            new_population.append(child)
+            new_population[_] = child
         return new_population
-                
-
 
     def mutation(self):
         pass
@@ -61,9 +58,14 @@ class TSP:
         # self.best_solution = self.population[0]
         self.best_individual = sorted(self.population, key=lambda individual: individual.fitness)[0]
 
+        print(self.best_individual.fitness)
+
         for generation in range(generations):
             self.population = self.generational_succession()
+            # print(self.population)
             self.mutation()
-            sorted_population = sorted(self.population, key=lambda individual: individual.fitness)[0]
-            if self.best_individual.fitness > sorted_population[0]:
+            sorted_population = sorted(self.population, key=lambda individual: individual.fitness)
+            if self.best_individual.fitness > sorted_population[0].fitness:
                 self.best_individual = sorted_population[0]
+        
+        return self.best_individual

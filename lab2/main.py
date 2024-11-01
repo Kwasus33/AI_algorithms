@@ -3,6 +3,8 @@ import pathlib
 
 import numpy as np
 import pandas as pd
+
+from TSP import TSP
 from solution_utils import generate_solution, decode_solution
 
 MINI_CITIES_NUM = 5
@@ -10,7 +12,9 @@ MINI_CITIES_NUM = 5
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--cities-path", type=pathlib.Path, required=True, help="Path to cities csv file")
+    parser.add_argument("--cities-path", type=pathlib.Path, 
+                        # required=True, 
+                        default="lab2/data/cities.csv", help="Path to cities csv file")
     parser.add_argument(
         "--problem-size",
         choices=["mini", "full"],
@@ -43,10 +47,14 @@ def main():
         np.random.seed(args.seed)
 
     data = load_data(args)
-    print(data)
-    solution = generate_solution(data)
-    print(solution)
-    print(decode_solution(data, solution))
+    # print(data)
+    # solution = generate_solution(data)
+    # print(solution)
+    # print(decode_solution(data, solution))
+
+    tsp = TSP(data)
+    best_solution = tsp.TSP_run(100)
+    print(best_solution.fitness)
 
 
 if __name__ == "__main__":
