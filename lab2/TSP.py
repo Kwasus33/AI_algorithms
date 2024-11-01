@@ -1,4 +1,4 @@
-import numpy as np
+import random, numpy as np
 from solution_utils import evaluate_solution, generate_solution, validate_solution
 POP_SIZE = 1000
 
@@ -28,14 +28,18 @@ class TSP:
             if cross_prob <= total_prob:
                 return individual
             
+    # OX - Order Crossover
     def crossover(self, parent1, parent2):
-        # solution = [None]*len(parent1.solution)
-        key = np.random.randint(1, len(parent1.solution)-1)
-        solution = parent1.solution.copy()[:key]
-        for param in parent2.solution.copy()[:-1]:
-            if param not in solution:
-                solution.append(param)
-        solution.append(parent2.solution.copy()[-1])
+        solution_size = len(parent1.solution)
+        solution = [None]*solution_size
+        start, end = sorted(np.random.choice(np.arange(solution_size), 2))
+        solution[start:end] = parent1.solution[start:end]
+        genes = [gene for gene in parent2.solution if gene not in solution]
+        pos = 0
+        for _ in range(solution_size):
+            if solution[_] is None:
+                solution[_] = genes[pos]
+                pos+=1
         validate_solution(self.data, solution)
         return Route(solution, evaluate_solution(self.data, solution))
 
