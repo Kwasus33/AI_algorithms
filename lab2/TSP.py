@@ -1,6 +1,6 @@
 import numpy as np
 from solution_utils import evaluate_solution, generate_solution, validate_solution
-POP_SIZE = 10
+POP_SIZE = 1000
 MUTATION_PROB = 0.05
 SHIFT = 1000
 
@@ -17,7 +17,9 @@ class Route:
         # + SHIFT guarantees that fitness for individual with lowest route is not 1/0, it's (1/EPS)**2 so it's highest fitness value
     
     def mutate(self):
-        pass
+        gene1 = np.random.randint(1,len(self.solution)-1)
+        gene2 = np.random.randint(1, len(self.solution)-1)
+        self.solution[gene1], self.solution[gene2] = self.solution[gene2], self.solution[gene1]
 
 class TSP:
     def __init__(self, data):
@@ -30,21 +32,12 @@ class TSP:
         for individual in self.population:
             individual.set_fitness(1/(individual.evaluation - min_evaluation + SHIFT))
 
-    def inverted_softmax_fitness(self):
-        evaluations = [-individual.evaluation for individual in self.population]
-        e_x = np.exp(evaluations)
-        inverted_softmax = e_x / e_x.sum()
-        for individual, fitness in zip(self.population, inverted_softmax):
-            individual.set_fitness(fitness)
-            print(fitness)
-
     def generate_population(self):
         for _ in range(POP_SIZE):
             solution = generate_solution(self.data)
             evaluation = evaluate_solution(self.data, solution)
             self.population[_] = Route(solution, evaluation)
-        # self.calculate_fitnesses()
-        self.inverted_softmax_fitness()
+        self.calculate_fitnesses()
 
     def generational_succession(self):
         new_population = [None]*POP_SIZE
@@ -52,12 +45,10 @@ class TSP:
             # parent1 = self.roulette_selection_1()
             # parent2 = self.roulette_selection_1()
             parent1, parent2 = self.roulette_selection_2()
-            child = self.crossover(parent1, parent2)
-            new_population[_] = child
-        # new_population = self.mutation(new_population)
+            child = self.crossover(parent1, parent2) 
+            new_population[_] = self.mutation(child)
         self.population = new_population
-        # self.calculate_fitnesses()
-        self.inverted_softmax_fitness()
+        self.calculate_fitnesses()
 
     def roulette_selection_1(self):
         total_prob = 0
@@ -89,8 +80,12 @@ class TSP:
         validate_solution(self.data, solution)
         return Route(solution, evaluate_solution(self.data, solution))
 
-    def mutation(self, population):
-        return population
+    def mutation(self, child):
+        mutation_prob = np.random.random()
+        if mutation_prob <= MUTATION_PROB:
+            child.mutate()
+            validate_solution(self.data, child.solution)
+        return child
 
     def TSP_run(self, generations):
         self.generate_population()

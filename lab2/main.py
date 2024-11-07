@@ -6,6 +6,7 @@ import pandas as pd
 
 from TSP import TSP
 from solution_utils import generate_solution, decode_solution
+from visualizer import Visualizer
 
 MINI_CITIES_NUM = 5
 
@@ -47,8 +48,9 @@ def main():
     data = load_data(args)
 
     tsp = TSP(data)
-    best_solution = tsp.TSP_run(3)
+    best_solution = tsp.TSP_run(100)
     print(f"Best individual in all generations is:\n {best_solution.solution},\n {best_solution.evaluation}")
+    Visualizer(data, best_solution.solution).draw_route_on_map()
 
 
 if __name__ == "__main__":
