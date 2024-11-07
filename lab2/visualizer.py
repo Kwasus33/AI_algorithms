@@ -26,6 +26,6 @@ class Visualizer:
 
     def draw_route_on_map(self):
         self._extract_coordinates()
-        gmap = gmplot.GoogleMapPlotter(self.latitudes[0], self.longitudes[0], 10)  # Center the map around the first city
-        gmap.plot(self.latitudes, self.longitudes, 'cornflowerblue', edge_width=2)
+        gmap = gmplot.GoogleMapPlotter(self.latitudes[0], self.longitudes[0], 10)
+        gmap.plot(self.latitudes, self.longitudes, "cornflowerblue", edge_width=2)
         gmap.draw("tsp_route.html")
