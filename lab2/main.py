@@ -47,7 +47,7 @@ def main():
     data = load_data(args)
 
     tsp = TSP(data)
-    best_solution = tsp.TSP_run(100)
+    best_solution = tsp.TSP_run(3)
     print(f"Best individual in all generations is:\n {best_solution.solution},\n {best_solution.evaluation}")
 
 

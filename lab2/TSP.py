@@ -1,6 +1,6 @@
 import numpy as np
 from solution_utils import evaluate_solution, generate_solution, validate_solution
-POP_SIZE = 1000
+POP_SIZE = 10
 MUTATION_PROB = 0.05
 SHIFT = 1000
 
@@ -30,13 +30,22 @@ class TSP:
         for individual in self.population:
             individual.set_fitness(1/(individual.evaluation - min_evaluation + SHIFT))
 
+    def inverted_softmax_fitness(self):
+        evaluations = [-individual.evaluation for individual in self.population]
+        e_x = np.exp(evaluations)
+        inverted_softmax = e_x / e_x.sum()
+        for individual, fitness in zip(self.population, inverted_softmax):
+            individual.set_fitness(fitness)
+            print(fitness)
+
     def generate_population(self):
         for _ in range(POP_SIZE):
             solution = generate_solution(self.data)
             evaluation = evaluate_solution(self.data, solution)
             self.population[_] = Route(solution, evaluation)
-        self.calculate_fitnesses()
-    
+        # self.calculate_fitnesses()
+        self.inverted_softmax_fitness()
+
     def generational_succession(self):
         new_population = [None]*POP_SIZE
         for _ in range(POP_SIZE):
@@ -47,8 +56,9 @@ class TSP:
             new_population[_] = child
         # new_population = self.mutation(new_population)
         self.population = new_population
-        self.calculate_fitnesses()
-    
+        # self.calculate_fitnesses()
+        self.inverted_softmax_fitness()
+
     def roulette_selection_1(self):
         total_prob = 0
         cross_prob = np.random.random()
@@ -93,10 +103,5 @@ class TSP:
             generation_best_individual = sorted(self.population, key=lambda individual: individual.evaluation)[0]
             if self.best_individual.evaluation > generation_best_individual.evaluation:
                 self.best_individual = generation_best_individual
-
-            # if generation % 10 == 0:
-            #     for individual in self.population:
-            #         print(f"{individual.solution}\n")
-            #     print(f"\n\n\n{self.best_individual.solution}, {self.best_individual.evaluation}\n\n\n")
 
         return self.best_individual
