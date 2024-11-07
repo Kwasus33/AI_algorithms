@@ -45,14 +45,10 @@ def main():
         np.random.seed(args.seed)
 
     data = load_data(args)
-    # print(data)
-    # solution = generate_solution(data)
-    # print(solution)
-    # print(decode_solution(data, solution))
 
     tsp = TSP(data)
     best_solution = tsp.TSP_run(100)
-    print(f"\n\n\n {best_solution.solution}, {best_solution.evaluation}")
+    print(f"Best individual in all generations is:\n {best_solution.solution},\n {best_solution.evaluation}")
 
 
 if __name__ == "__main__":
