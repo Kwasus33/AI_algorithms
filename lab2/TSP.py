@@ -21,10 +21,11 @@ class TSP:
             self.population[_] = Route(solution, fitness)
 
     def rulete_selection(self, fitness_sum):
+        # prob set as 1/fitness - we minimize fitness but maximize prob
         total_prob = 0
         cross_prob = np.random.random()
         for individual in self.population:
-            total_prob+=(individual.fitness/fitness_sum)
+            total_prob+=(1/individual.fitness)/fitness_sum
             if cross_prob <= total_prob:
                 return individual
             
@@ -45,7 +46,7 @@ class TSP:
 
     def generational_succession(self):
         new_population = [None]*POP_SIZE
-        fitness_sum = sum(individual.fitness for individual in self.population)
+        fitness_sum = sum(1/individual.fitness for individual in self.population)
         for _ in range(POP_SIZE):
             parent1 = self.rulete_selection(fitness_sum)
             parent2 = self.rulete_selection(fitness_sum)
@@ -58,18 +59,20 @@ class TSP:
     
     def TSP_run(self, generations):
         self.generate_population()
-        # self.population = sorted(self.population, key=lambda individual: individual.fitness, reverse=True)
-        # self.best_solution = self.population[0]
-        self.best_individual = sorted(self.population, key=lambda individual: individual.fitness)[0]
+        self.population = sorted(self.population, key=lambda individual: individual.fitness)
+        self.best_individual = self.population[0]
+        # self.best_individual = sorted(self.population, key=lambda individual: individual.fitness)[0]
 
         print(self.best_individual.fitness)
 
         for generation in range(generations):
-            self.population = self.generational_succession()
-            # print(self.population)
+            # self.population = self.generational_succession()
+            self.population = sorted(self.generational_succession(), key=lambda individual: individual.fitness)
             self.mutation()
-            sorted_population = sorted(self.population, key=lambda individual: individual.fitness)
-            if self.best_individual.fitness > sorted_population[0].fitness:
-                self.best_individual = sorted_population[0]
+            # sorted_population = sorted(self.population, key=lambda individual: individual.fitness)
+            # if self.best_individual.fitness > sorted_population[0].fitness:
+            #     self.best_individual = sorted_population[0]
+            if self.best_individual.fitness > self.population[0].fitness:
+                self.best_individual = self.population[0]
         
         return self.best_individual

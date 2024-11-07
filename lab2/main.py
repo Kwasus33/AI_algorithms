@@ -53,7 +53,7 @@ def main():
     # print(decode_solution(data, solution))
 
     tsp = TSP(data)
-    best_solution = tsp.TSP_run(100)
+    best_solution = tsp.TSP_run(200)
     print(best_solution.fitness)
 
 
