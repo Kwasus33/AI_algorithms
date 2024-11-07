@@ -12,7 +12,7 @@ class Route:
         self.fitness = None
 
     def set_fitness(self, fitness):
-        self.fitness = fitness**2   
+        self.fitness = fitness**2
         # fitness is (1/(evaluation - min_eval + EPS)) - lowest eval means best fitness value and ^2 quarantees bigger bias
         # + SHIFT guarantees that fitness for individual with lowest route is not 1/0, it's (1/EPS)**2 so it's highest fitness value
     
@@ -25,11 +25,17 @@ class TSP:
         self.population = [None]*POP_SIZE
         self.best_solution = None
 
+    def calculate_fitnesses(self):
+        min_evaluation = min(individual.evaluation for individual in self.population)
+        for individual in self.population:
+            individual.set_fitness(1/(individual.evaluation - min_evaluation + SHIFT))
+
     def generate_population(self):
         for _ in range(POP_SIZE):
             solution = generate_solution(self.data)
             evaluation = evaluate_solution(self.data, solution)
             self.population[_] = Route(solution, evaluation)
+        self.calculate_fitnesses()
     
     def generational_succession(self):
         new_population = [None]*POP_SIZE
@@ -40,7 +46,8 @@ class TSP:
             child = self.crossover(parent1, parent2)
             new_population[_] = child
         # new_population = self.mutation(new_population)
-        return new_population
+        self.population = new_population
+        self.calculate_fitnesses()
     
     def roulette_selection_1(self):
         total_prob = 0
@@ -75,20 +82,14 @@ class TSP:
     def mutation(self, population):
         return population
 
-    def calculate_fitnesses(self):
-        min_evaluation = min(individual.evaluation for individual in self.population)
-        for individual in self.population:
-            individual.set_fitness(1/(individual.evaluation - min_evaluation + SHIFT))
-
     def TSP_run(self, generations):
         self.generate_population()
-        self.calculate_fitnesses()
         self.best_individual = sorted(self.population, key=lambda individual: individual.evaluation)[0]
         print(f'First population best individual: {self.best_individual.evaluation}')
 
         for generation in range(generations):
-            self.population = self.generational_succession()
-            self.calculate_fitnesses()
+            self.generational_succession()
+            
             generation_best_individual = sorted(self.population, key=lambda individual: individual.evaluation)[0]
             if self.best_individual.evaluation > generation_best_individual.evaluation:
                 self.best_individual = generation_best_individual
