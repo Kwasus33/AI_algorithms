@@ -12,9 +12,7 @@ MINI_CITIES_NUM = 5
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--cities-path", type=pathlib.Path, 
-                        # required=True, 
-                        default="lab2/data/cities.csv", help="Path to cities csv file")
+    parser.add_argument("--cities-path", type=pathlib.Path, required=True, help="Path to cities csv file")
     parser.add_argument(
         "--problem-size",
         choices=["mini", "full"],
@@ -53,8 +51,8 @@ def main():
     # print(decode_solution(data, solution))
 
     tsp = TSP(data)
-    best_solution = tsp.TSP_run(200)
-    print(best_solution.fitness)
+    best_solution = tsp.TSP_run(100)
+    print(f"\n\n\n {best_solution.solution}, {best_solution.evaluation}")
 
 
 if __name__ == "__main__":
