@@ -3,6 +3,7 @@ import copy
 from solution_utils import evaluate_solution, generate_solution, validate_solution
 
 MUTATION_PROB = 0.05
+CROSS_PROB = 1
 SHIFT = 1000
 
 
@@ -48,8 +49,11 @@ class TSP:
             # parent1 = self.roulette_selection_1()
             # parent2 = self.roulette_selection_1()
             parent1, parent2 = self.roulette_selection_2()
-            child = self.crossover(parent1, parent2)
-            new_population[_] = self.mutation(child)
+            if CROSS_PROB > np.random.random():
+                child = self.crossover(parent1, parent2)
+                new_population[_] = self.mutation(child)
+            else:
+                new_population[_] = parent1 if parent1.evaluation < parent2.evaluation else parent2
         self.population = new_population
         self.calculate_fitnesses()
 
