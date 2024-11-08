@@ -96,10 +96,9 @@ def produce_results(data, args):
             )
 
     else:
-        best_individual, best_indivs_vec = tsp.TSP_run(generations, pop_size)
-        all_best_individuals = copy.deep_copy(best_indivs_vec)
+        best_of_all, all_best_individuals = tsp.TSP_run(generations, pop_size)
         print(f"This population best individual {best_individual.evaluation}\n")
-        best_indivs_vec = [ind.evaluation for ind in best_indivs_vec]
+        best_indivs_vec = [ind.evaluation for ind in all_best_individuals]
         min_values = np.min(best_indivs_vec)
         max_values = np.max(best_indivs_vec)
         std_devs = np.std(best_indivs_vec)
