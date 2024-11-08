@@ -1,7 +1,7 @@
 import numpy as np
+import copy
 from solution_utils import evaluate_solution, generate_solution, validate_solution
 
-POP_SIZE = 1000
 MUTATION_PROB = 0.05
 SHIFT = 1000
 
@@ -29,8 +29,6 @@ class Route:
 class TSP:
     def __init__(self, data):
         self.data = data
-        self.population = [None] * POP_SIZE
-        self.best_solution = None
 
     def calculate_fitnesses(self):
         min_evaluation = min(individual.evaluation for individual in self.population)
@@ -38,15 +36,15 @@ class TSP:
             individual.set_fitness(1 / (individual.evaluation - min_evaluation + SHIFT))
 
     def generate_population(self):
-        for _ in range(POP_SIZE):
+        for _ in range(self.pop_size):
             solution = generate_solution(self.data)
             evaluation = evaluate_solution(self.data, solution)
             self.population[_] = Route(solution, evaluation)
         self.calculate_fitnesses()
 
     def generational_succession(self):
-        new_population = [None] * POP_SIZE
-        for _ in range(POP_SIZE):
+        new_population = [None] * self.pop_size
+        for _ in range(self.pop_size):
             # parent1 = self.roulette_selection_1()
             # parent2 = self.roulette_selection_1()
             parent1, parent2 = self.roulette_selection_2()
@@ -92,12 +90,18 @@ class TSP:
             validate_solution(self.data, child.solution)
         return child
 
-    def TSP_run(self, generations):
+    def TSP_run(self, generations, pop_size):
+        self.pop_size = pop_size
+        self.population = [None] * self.pop_size
+        self.best_solution = None
+        self.all_best_individuals = []
+
         self.generate_population()
         self.best_individual = sorted(
             self.population, key=lambda individual: individual.evaluation
         )[0]
-        print(f"First population best individual: {self.best_individual.evaluation}")
+        print(f"First generation/starting best individual: {self.best_individual.evaluation}")
+        self.all_best_individuals.append(self.best_individual)
 
         for generation in range(generations):
             self.generational_succession()
@@ -105,7 +109,8 @@ class TSP:
             generation_best_individual = sorted(
                 self.population, key=lambda individual: individual.evaluation
             )[0]
+            self.all_best_individuals.append(generation_best_individual)
             if self.best_individual.evaluation > generation_best_individual.evaluation:
                 self.best_individual = generation_best_individual
 
-        return self.best_individual
+        return (self.best_individual, self.all_best_individuals)

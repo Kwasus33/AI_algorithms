@@ -1,3 +1,5 @@
 .idea
 __pycache__/
 /venv
+lab2/results_table.png
+lab2/tsp_route.html
