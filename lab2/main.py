@@ -40,7 +40,7 @@ def parse_args():
         action='store_true',
         help="Run algorithm on experiment mode with best fitting hiperparameters",
     )
-    parser.add_argument("--pop-size", type=validate)
+    parser.add_argument("--pop-size", type=validate, help="If given pop_size < 100, pop_size = 100 would be used")
     parser.add_argument("--generations", type=validate)
     parser.add_argument("--seed", type=int)
     return parser.parse_args()
@@ -75,7 +75,7 @@ def produce_results(data, args):
     means = []
 
     generations = args.generations if args.generations else 100
-    pop_size = args.pop_size if args.pop_size else 1000
+    pop_size = args.pop_size if args.pop_size and args.pop_size >= 100 else 1000
 
     if args.experiment:
         all_best_individuals = []
