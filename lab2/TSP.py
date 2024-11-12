@@ -1,9 +1,8 @@
 import numpy as np
-import copy
 from solution_utils import evaluate_solution, generate_solution, validate_solution
 
 MUTATION_PROB = 0.05
-CROSS_PROB = 1
+CROSS_PROB = 0.7
 SHIFT = 1000
 
 
@@ -37,23 +36,25 @@ class TSP:
             individual.set_fitness(1 / (individual.evaluation - min_evaluation + SHIFT))
 
     def generate_population(self):
-        for _ in range(self.pop_size):
+        for i in range(self.pop_size):
             solution = generate_solution(self.data)
             evaluation = evaluate_solution(self.data, solution)
-            self.population[_] = Route(solution, evaluation)
+            self.population[i] = Route(solution, evaluation)
         self.calculate_fitnesses()
 
     def generational_succession(self):
         new_population = [None] * self.pop_size
-        for _ in range(self.pop_size):
+        for i in range(self.pop_size):
             # parent1 = self.roulette_selection_1()
             # parent2 = self.roulette_selection_1()
             parent1, parent2 = self.roulette_selection_2()
             if CROSS_PROB > np.random.random():
                 child = self.crossover(parent1, parent2)
-                new_population[_] = self.mutation(child)
+                new_population[i] = self.mutation(child)
             else:
-                new_population[_] = parent1 if parent1.evaluation < parent2.evaluation else parent2
+                new_population[i] = (
+                    parent1 if parent1.evaluation < parent2.evaluation else parent2
+                )
         self.population = new_population
         self.calculate_fitnesses()
 
@@ -80,9 +81,9 @@ class TSP:
         solution[start:end] = parent1.solution[start:end]
         genes = [gene for gene in parent2.solution if gene not in solution]
         pos = 0
-        for _ in range(solution_size):
-            if solution[_] is None:
-                solution[_] = genes[pos]
+        for i in range(solution_size):
+            if solution[i] is None:
+                solution[i] = genes[pos]
                 pos += 1
         validate_solution(self.data, solution)
         return Route(solution, evaluate_solution(self.data, solution))
@@ -104,7 +105,9 @@ class TSP:
         self.best_individual = sorted(
             self.population, key=lambda individual: individual.evaluation
         )[0]
-        print(f"First generation/starting best individual: {self.best_individual.evaluation}")
+        print(
+            f"First generation/starting best individual: {self.best_individual.evaluation}"
+        )
         self.all_best_individuals.append(self.best_individual)
 
         for generation in range(generations):

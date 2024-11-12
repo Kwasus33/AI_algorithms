@@ -32,26 +32,35 @@ class Visualizer:
         gmap.plot(self.latitudes, self.longitudes, "cornflowerblue", edge_width=2)
         gmap.draw("tsp_route.html")
 
-    def generate_table(self, output_image, best_solutions, min_values,max_values, std_devs, means, pop_size):
-        rows = list(range(100, pop_size+1, 100))
-       
+    def generate_table(
+        self, output_image, best_solutions, max_values, std_devs, means, pop_size
+    ):
+        rows = list(range(100, pop_size + 1, 100))
+
         data = {
-            'best_solution': [best_solution.evaluation for best_solution in best_solutions],
-            'min': min_values,
-            'max': max_values,
-            'std_dev': std_devs,
-            'mean': means
+            "best_solution": [
+                best_solution.evaluation for best_solution in best_solutions
+            ],
+            "max": max_values,
+            "std_dev": std_devs,
+            "mean": means,
         }
 
         df = pd.DataFrame(data, index=rows)
 
         fig, ax = plt.subplots(figsize=(10, 6))
-        ax.axis('tight')
-        ax.axis('off')
-        table = ax.table(cellText=df.values, colLabels=df.columns, rowLabels=df.index, cellLoc='center', loc='center')
+        ax.axis("tight")
+        ax.axis("off")
+        table = ax.table(
+            cellText=df.values,
+            colLabels=df.columns,
+            rowLabels=df.index,
+            cellLoc="center",
+            loc="center",
+        )
         table.auto_set_font_size(False)
         table.set_fontsize(10)
         table.scale(1.2, 1.2)
 
-        plt.savefig(output_image, bbox_inches='tight')
+        plt.savefig(output_image, bbox_inches="tight")
         plt.close()
