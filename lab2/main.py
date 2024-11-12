@@ -99,9 +99,13 @@ def produce_results(data, args):
         best_of_all, all_best_individuals = tsp.TSP_run(generations, pop_size)
         print(f"This population best individual {best_of_all.evaluation}\n")
         best_indivs_vec = [ind.evaluation for ind in all_best_individuals]
-        max_values = np.max(best_indivs_vec)
-        std_devs = np.std(best_indivs_vec)
-        means = np.mean(best_indivs_vec)
+        max_value = np.max(best_indivs_vec)
+        std_dev = np.std(best_indivs_vec)
+        mean = np.mean(best_indivs_vec)
+        print(
+            f"From best individuals of all generations in this population - "
+            + f"max individual evaluation is {max_value}, std deviation is {std_dev}, mean is {mean}"
+        )
 
     visualizer = Visualizer(data, best_of_all.solution)
     visualizer.draw_route_on_map()
