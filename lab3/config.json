@@ -3,7 +3,8 @@
         "type": "human"
     },
     "o": {
-        "type": "random"
+        "type": "minimax",
+        "depth": 5
     },
     "gui": true
 }
