@@ -46,48 +46,57 @@ class MinimaxComputerPlayer(Player):
         self.depth = int(config["depth"]) if config["depth"] else 0
 
     def get_move(self, event_position):
-        best_move = None
+        best_move = [-1, -1]
         best_eval = -math.inf
         for move in self.game.available_moves():
-            moves = copy.deepcopy(self.game.available_moves())
             depth = copy.copy(self.depth)
             alpha = -math.inf
             beta = math.inf
-            moves = moves[moves != move]
-            moveEval = self._minimax(move, moves, depth, False, alpha, beta)     
-            best_move = max(moveEval, best_move)
+            moveEval = self._minimax(move, depth, False, alpha, beta) - depth
             if moveEval > best_eval:
                 best_move = move
                 best_eval = moveEval
-            
         return best_move
 
 
-    def _minimax(self, moved, moves, depth, isMax, alpha, beta):
-        self.moves = moves
+    def _minimax(self, moved, depth, isMax, alpha, beta):
+        self.game.move(moved)
 
-        if depth == 0 or len(moves) == 0:
+        if self.game.get_winner() == 'x':
+            self.game.unmove(moved)
+            return 1
+        elif self.game.get_winner() == 'o':
+            self.game.unmove(moved)
+            return -1
+        elif self.game.get_winner() == 't':
+            self.game.unmove(moved)
+            return 0
+
+        if depth == 0 or len(self.game.available_moves()) == 0:
             x, y = moved
+            self.game.unmove(moved)
             return HEURISTIC[x][y]
         
         if isMax:
             MaxEval = -math.inf
-            for move in self.moves:
-                self.moves = self.moves[self.moves != move]
-                eval = self._minimax(move, moves, depth-1, not isMax, alpha, beta)
+            for move in self.game.available_moves():
+                eval = self._minimax(move, depth-1, not isMax, alpha, beta)
                 MaxEval = max(MaxEval, eval)
                 alpha = max(alpha, eval)
                 if beta <= alpha:
+                    self.game.unmove(moved)
                     return MaxEval
+            self.game.unmove(moved)
             return MaxEval
         
         else:
             MinEval = math.inf
-            for move in moves:
-                self.moves = self.moves[self.moves != move]
-                eval = self._minimax(move, moves, depth-1, isMax, alpha, beta)
+            for move in self.game.available_moves():
+                eval = self._minimax(move, depth-1, isMax, alpha, beta)
                 MinEval = min(MinEval, eval)
                 beta = min(MinEval, eval)
                 if beta <= alpha:
+                    self.game.unmove(moved)
                     return MinEval
+            self.game.unmove(moved)
             return MinEval
