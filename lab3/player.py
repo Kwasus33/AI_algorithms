@@ -50,12 +50,10 @@ class MinimaxComputerPlayer(Player):
         best_move = [-1, -1]
         best_eval = -math.inf if self.maximizing_player else math.inf
         for move in self.game.available_moves():
-            # depth = copy.copy(self.depth)
             alpha = -math.inf
             beta = math.inf
-            # moveEval = self._minimax(move, depth, True, alpha, beta) - depth
             isMax = self.maximizing_player
-            moveEval = self._minimax(move, self.depth, isMax, alpha, beta)
+            moveEval = self._minimax(move, self.depth, not isMax, alpha, beta)
             if self.maximizing_player:
                 if moveEval > best_eval:
                     best_move = move
@@ -80,11 +78,11 @@ class MinimaxComputerPlayer(Player):
             self.game.unmove(moved)
             return 0
 
-        if depth == 0 or len(self.game.available_moves()) == 0:
+        if depth == 0:
             x, y = moved
             self.game.unmove(moved)
-            # return HEURISTIC[x][y]
-            return 0
+            return HEURISTIC[x][y]
+            # return 0
 
         if isMax:
             MaxEval = -math.inf
