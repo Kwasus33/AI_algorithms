@@ -11,7 +11,9 @@ from player import build_player
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config", type=pathlib.Path, required=True, help="Path to game config")
+    parser.add_argument("--config", type=pathlib.Path, 
+                        # required=True, 
+                        default="lab3/config.json", help="Path to game config")
     parser.add_argument("--seed", type=int)
     return parser.parse_args()
 
