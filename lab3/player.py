@@ -5,6 +5,7 @@ import math, copy
 
 HEURISTIC = [[3, 2, 3], [2, 4, 2], [3, 2, 3]]
 
+
 def build_player(player_config, game):
     assert player_config["type"] in ["human", "random", "minimax"]
 
@@ -27,10 +28,17 @@ class Player(ABC):
     def get_move(self, event_position):
         pass
 
+    @abstractmethod
+    def isHuman(self):
+        pass
+
 
 class HumanPlayer(Player):
     def get_move(self, event_position):
         return event_position
+
+    def isHuman(self):
+        return True
 
 
 class RandomComputerPlayer(Player):
@@ -39,11 +47,17 @@ class RandomComputerPlayer(Player):
         move_id = np.random.choice(len(available_moves))
         return available_moves[move_id]
 
+    def isHuman(self):
+        return False
+
 
 class MinimaxComputerPlayer(Player):
     def __init__(self, game, config):
         super().__init__(game)
         self.depth = int(config["depth"]) if config["depth"] else 0
+
+    def isHuman(self):
+        return False
 
     def get_move(self, event_position):
         self.maximizing_player = True if self.game.player_x_turn else False
@@ -64,17 +78,16 @@ class MinimaxComputerPlayer(Player):
                     best_eval = moveEval
         return best_move
 
-
     def _minimax(self, moved, depth, isMax, alpha, beta):
         self.game.move(moved)
 
-        if self.game.get_winner() == 'x':
+        if self.game.get_winner() == "x":
             self.game.unmove(moved)
             return 100
-        elif self.game.get_winner() == 'o':
+        elif self.game.get_winner() == "o":
             self.game.unmove(moved)
             return -100
-        elif self.game.get_winner() == 't':
+        elif self.game.get_winner() == "t":
             self.game.unmove(moved)
             return 0
 
@@ -87,7 +100,7 @@ class MinimaxComputerPlayer(Player):
         if isMax:
             MaxEval = -math.inf
             for move in self.game.available_moves():
-                eval = self._minimax(move, depth-1, False, alpha, beta)
+                eval = self._minimax(move, depth - 1, False, alpha, beta)
                 MaxEval = max(MaxEval, eval)
                 alpha = max(alpha, eval)
                 if beta <= alpha:
@@ -95,11 +108,11 @@ class MinimaxComputerPlayer(Player):
                     return MaxEval
             self.game.unmove(moved)
             return MaxEval
-        
+
         else:
             MinEval = math.inf
             for move in self.game.available_moves():
-                eval = self._minimax(move, depth-1, True, alpha, beta)
+                eval = self._minimax(move, depth - 1, True, alpha, beta)
                 MinEval = min(MinEval, eval)
                 beta = min(MinEval, eval)
                 if beta <= alpha:
