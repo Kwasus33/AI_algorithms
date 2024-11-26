@@ -3,14 +3,28 @@ import pathlib
 
 import numpy as np
 import pandas as pd
-from solution_utils import generate_solution
+
+from TSP import TSP
+from visualizer import Visualizer
 
 MINI_CITIES_NUM = 5
 
 
 def parse_args():
+
+    def validate(value):
+        value = int(value)
+        if value <= 0:
+            raise argparse.ArgumentTypeError("Invalid value. Cannot be negative")
+        return value
+
     parser = argparse.ArgumentParser()
-    parser.add_argument("--cities-path", type=pathlib.Path, required=True, help="Path to cities csv file")
+    parser.add_argument(
+        "--cities-path",
+        type=pathlib.Path,
+        required=True,
+        help="Path to cities csv file",
+    )
     parser.add_argument(
         "--problem-size",
         choices=["mini", "full"],
@@ -19,21 +33,91 @@ def parse_args():
     )
     parser.add_argument("--start", type=str, default="Łomża")
     parser.add_argument("--finish", type=str, default="Częstochowa")
+    parser.add_argument(
+        "--experiment",
+        action="store_true",
+        help="Run algorithm on experiment mode with best fitting hiperparameters",
+    )
+    parser.add_argument(
+        "--pop-size",
+        type=validate,
+        help="If given pop_size < 100, pop_size = 100 would be used",
+    )
+    parser.add_argument("--generations", type=validate)
     parser.add_argument("--seed", type=int)
     return parser.parse_args()
 
 
 def load_data(args):
     data = pd.read_csv(args.cities_path)
-    data_without_start_and_finish = data[~((data.index == args.finish) | (data.index == args.start))]
+    data_without_start_and_finish = data[
+        ~((data.index == args.finish) | (data.index == args.start))
+    ]
     if args.problem_size == "mini":
         city_names = (
-            [args.start] + data_without_start_and_finish.sample(n=MINI_CITIES_NUM - 2).index.tolist() + [args.finish]
+            [args.start]
+            + data_without_start_and_finish.sample(n=MINI_CITIES_NUM - 2).index.tolist()
+            + [args.finish]
         )
     else:
-        city_names = [args.start] + data_without_start_and_finish.index.tolist() + [args.finish]
+        city_names = (
+            [args.start] + data_without_start_and_finish.index.tolist() + [args.finish]
+        )
+        # .index gives data frame 'data' column indexes, .tolist() converts them to list
 
     return data[city_names].loc[city_names]
+
+
+def produce_results(data, args):
+    tsp = TSP(data)
+
+    max_values = []
+    std_devs = []
+    means = []
+
+    generations = args.generations if args.generations else 100
+    pop_size = args.pop_size if args.pop_size and args.pop_size >= 100 else 1000
+
+    if args.experiment:
+        all_best_individuals = []
+
+        for i in range(100, pop_size + 1, 100):
+            best_individual, best_indivs_vec = tsp.TSP_run(generations, i)
+            print(f"This population best individual {best_individual.evaluation}\n")
+            all_best_individuals.append(best_individual)
+            best_indivs_vec = [ind.evaluation for ind in best_indivs_vec]
+            max_values.append(np.max(best_indivs_vec))
+            std_devs.append(np.std(best_indivs_vec))
+            means.append(np.mean(best_indivs_vec))
+
+        best_of_all = sorted(all_best_individuals, key=lambda ind: ind.evaluation)[0]
+        print(
+            f"Best individual in all generations is:\n {best_of_all.solution},\n {best_of_all.evaluation}"
+        )
+
+    else:
+        best_of_all, all_best_individuals = tsp.TSP_run(generations, pop_size)
+        print(f"This population best individual {best_of_all.evaluation}\n")
+        best_indivs_vec = [ind.evaluation for ind in all_best_individuals]
+        max_value = np.max(best_indivs_vec)
+        std_dev = np.std(best_indivs_vec)
+        mean = np.mean(best_indivs_vec)
+        print(
+            f"From best individuals of all generations in this population - "
+            + f"max individual evaluation is {max_value}, std deviation is {std_dev}, mean is {mean}"
+        )
+
+    visualizer = Visualizer(data, best_of_all.solution)
+    visualizer.draw_route_on_map()
+    if args.experiment:
+        visualizer.generate_table(
+            "results_table.png",
+            all_best_individuals,
+            max_values,
+            std_devs,
+            means,
+            pop_size,
+        )
 
 
 def main():
@@ -42,7 +126,7 @@ def main():
         np.random.seed(args.seed)
 
     data = load_data(args)
-    print(generate_solution(data))
+    produce_results(data, args)
 
 
 if __name__ == "__main__":
