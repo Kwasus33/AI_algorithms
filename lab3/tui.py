@@ -15,8 +15,10 @@ class GameTUI:
             self.board = self.game.board
             self.reset_board = False
             self.print_board()
+
             while not self.reset_board:
                 self.gameplay()
+
             if (
                 str(input("Press p if u want to play again, otherwise any other key: "))
                 == "p"
@@ -24,6 +26,7 @@ class GameTUI:
                 self.game.play_again()
             else:
                 end_game = True
+        print("Game is over.")
 
     def gameplay(self):
         self.move_player()
@@ -45,9 +48,8 @@ class GameTUI:
             if self.game.player_x_turn
             else self.player_o.get_move(position)
         )
-
-        self.game.move(position)
         print("Player x moved") if self.game.player_x_turn else print("Player o moved")
+        self.game.move(position)
 
     def check_winner(self):
         if self.game.get_winner() in ["x", "o", "t"]:
