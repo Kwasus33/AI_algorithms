@@ -33,3 +33,6 @@ class LogisticRegression:
         linear_pred = np.dot(X, self.weights) + self.bias
         y_pred = self._sigmoid(linear_pred)
         return np.array([1 if pred > self.threshold else 0 for pred in y_pred])
+    
+    def predict_prob(self, X):
+        return np.zeros(len(X))

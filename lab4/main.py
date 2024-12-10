@@ -39,6 +39,29 @@ def prep_data(seed):
     return (X_train, X_test, y_train, y_test)
 
 
+def minMax_normalization(df):
+    for column in df.columns:
+        Max = max(df[column])
+        Min = min(df[column])
+        df[column] = df[column].map(lambda x: (x - Min) / (Max - Min))
+    return df
+
+
+def get_results(args, data):
+    X_train, X_test, y_train, y_test = data
+    
+    model = LogisticRegression(args.learning_rate, args.iters, args.threshold)
+    model.fit(X_train, y_train)
+    y_pred = model.predict(X_test)
+    y_pred_prob = model.predict_prob(X_test)
+
+    accuracy = accuracy_score(y_test, y_pred)
+    f1 = f1_score(y_test, y_pred)
+    auroc = roc_auc_score(y_test, y_pred_prob)
+
+    return (accuracy, f1, auroc)
+
+
 def main():
     args = parseArgs()
 
@@ -50,18 +73,40 @@ def main():
     X_train, X_test, y_train, y_test = prep_data(seed)
 
     scaler = StandardScaler()
-    X_train = scaler.fit_transform(X_train)
-    X_test = scaler.fit_transform(X_test)
+    X_train_scaled = scaler.fit_transform(X_train, y_train)
+    X_test_scaled = scaler.fit_transform(X_test, y_test)
 
-    model = LogisticRegression(args.learning_rate, args.iters, args.threshold)
-    model.fit(X_train, y_train)
-    y_pred = model.predict(X_test)
+    data =  X_train_scaled, X_test_scaled, y_train, y_test
+    accuracy, f1, auroc = get_results(args, data)
 
-    accuracy = accuracy_score(y_test, y_pred)
-    f1 = f1_score(y_test, y_pred)
-
+    print("Test 1: ")
     print(f"Accuracy: {accuracy:.3f}")
     print(f"F-score: {f1:.3f}")
+    print(f"Auroc: {auroc:.3f}")
+
+    columns = X_train.columns
+    drop_columns = np.random.choice(columns, size=10, replace=False)
+    X_test_dropped = scaler.fit_transform(X_test.drop(columns=drop_columns))
+    X_train_dropped = scaler.fit_transform(X_train.drop(columns=drop_columns))
+
+    data =  X_train_dropped, X_test_dropped, y_train, y_test
+    accuracy, f1, auroc = get_results(args, data)
+
+    print("Test 2: ")
+    print(f"Accuracy: {accuracy:.3f}")
+    print(f"F-score: {f1:.3f}")
+    print(f"Auroc: {auroc:.3f}")
+
+    X_train_minMax = minMax_normalization(X_train)
+    X_test_minMax = minMax_normalization(X_test)
+
+    data =  X_train_minMax, X_test_minMax, y_train, y_test
+    accuracy, f1, auroc = get_results(args, data)
+
+    print("Test 3: ")
+    print(f"Accuracy: {accuracy:.3f}")
+    print(f"F-score: {f1:.3f}")
+    print(f"Auroc: {auroc:.3f}")
 
 
 if __name__ == "__main__":
