@@ -61,7 +61,7 @@ def get_results(args, data, targets):
         y_pred = model.predict(X_test)
         y_pred_proba = model.predict_proba(X_test)
 
-        plot_roc(y_test, y_pred, y_pred_proba, key)
+        plot_roc(y_test, y_pred_proba, key)
 
         accuracy = accuracy_score(y_test, y_pred)
         f1 = f1_score(y_test, y_pred)
