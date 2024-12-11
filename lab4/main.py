@@ -1,5 +1,6 @@
 from ucimlrepo import fetch_ucirepo
 from logistic_regression import LogisticRegression
+from plotter import plot_roc
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
@@ -59,6 +60,8 @@ def get_results(args, data, targets):
         model.fit(X_train, y_train)
         y_pred = model.predict(X_test)
         y_pred_proba = model.predict_proba(X_test)
+
+        plot_roc(y_test, y_pred, y_pred_proba, key)
 
         accuracy = accuracy_score(y_test, y_pred)
         f1 = f1_score(y_test, y_pred)
