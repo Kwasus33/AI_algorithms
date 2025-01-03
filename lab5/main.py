@@ -29,7 +29,7 @@ def main():
         input_size=X_train.shape[1],
         hidden_layers_size=[10, 6, 4],
         output_size=1,
-        lr=0.1,
+        lr=0.01,
         # weights_init="HE"
     )
 
