@@ -23,7 +23,7 @@ def train(epochs, seed, learner, explorer):
 
         while not endpoint:
             action = explorer.choose_action(
-                action_space=env.action_space, state=state, qtable=learner.qtable
+                actions_space=env.action_space, state=state, qtable=learner.qtable
             )  # with every epoch more of learner.qtable is being filled with env exploration and exploation values
 
             states_log.append(state)
@@ -52,6 +52,8 @@ def train(epochs, seed, learner, explorer):
         # saves all rewards and steps
         rewards_log[epoch] = total_rewards
         steps_log[epoch] = step
+
+    env.render()
 
     return rewards_log, steps_log, learner.qtable, states_log, actions_log
 

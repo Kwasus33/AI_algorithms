@@ -22,7 +22,7 @@ class Qlearning:
             + self.discount_factor * np.max(self.qtable[new_state, :])
             - self.qtable[state, action]
         )
-        self.qtable[state, action] += self.learning_rate * delta
+        self.qtable[state, action] += self.lr * delta
 
     def _reset_qtable(self):
         self.qtable = np.zeros((self.states_size, self.actions_size))
