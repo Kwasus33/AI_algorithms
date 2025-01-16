@@ -43,7 +43,7 @@ class EpsilonGreedy:
 
         # Exploitation (choosing best move - taking the biggest Q-value for this state)
         else:
-            # action = np.argmax(qtable[state])
+            # action = np.argmax(qtable[state, :])
 
             max_ids = np.where(qtable[state, :] == max(qtable[state, :]))[0]
             action = np.random.choice(max_ids)

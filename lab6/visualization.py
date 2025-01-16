@@ -25,11 +25,11 @@ def qtable_directions_map(qtable):
     """Get the best learned action & map it to arrows."""
     qtable_val_max = qtable.max(axis=1).reshape(4, 12)
     qtable_best_action = np.argmax(qtable, axis=1).reshape(4, 12)
-    directions = {0: "←", 1: "↓", 2: "→", 3: "↑"}
+    directions = {0: "↑", 1: "→", 2: "↓", 3: "←"}
     qtable_directions = np.empty(qtable_best_action.flatten().shape, dtype=str)
-    eps = -10
+    eps = 0
     for idx, val in enumerate(qtable_best_action.flatten()):
-        if qtable_val_max.flatten()[idx] > eps:
+        if qtable_val_max.flatten()[idx] < eps:
             # Assign an arrow only if a minimal Q-value has been learned as best action
             # otherwise since 0 is a direction, it also gets mapped on the tiles where
             # it didn't actually learn anything
@@ -73,7 +73,7 @@ def plot_q_values_map(qtable, env):
 
 def plot_states_actions_distribution(states, actions):
     """Plot the distributions of states and actions."""
-    labels = {"LEFT": 0, "DOWN": 1, "RIGHT": 2, "UP": 3}
+    labels = {"UP": 0, "RIGHT": 1, "DOWN": 2, "LEFT": 3}
 
     fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(15, 5))
     sns.histplot(data=states, ax=ax[0], kde=True)
