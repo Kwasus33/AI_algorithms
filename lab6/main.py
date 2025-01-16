@@ -1,6 +1,14 @@
 from Qlearning import Qlearning, EpsilonGreedy
+from visualization import (
+    plot_q_values_map,
+    plot_states_actions_distribution,
+    postprocess,
+    qtable_directions_map,
+)
 import gymnasium as gym
 import numpy as np
+import pandas as pd
+
 
 env = gym.make("CliffWalking-v0", render_mode="human")
 
@@ -59,7 +67,7 @@ def train(epochs, seed, learner, explorer):
 
 
 def main():
-    epochs = 1000
+    epochs = 10
     seed = np.random.seed()
     learner = Qlearning(
         states_size=STATES_SIZE,
@@ -68,7 +76,19 @@ def main():
         learning_rate=0.9,
     )
     explorer = EpsilonGreedy(epsilon=0.2)
-    train(epochs, seed, learner, explorer)
+
+    rewards, steps, qtable, states, actions = train(epochs, seed, learner, explorer)
+
+    # Save the results in dataframes
+    results, steps = postprocess(epochs, params, rewards, steps)
+    # qtable = qtable.mean(axis=0)  # Average the Q-table between runs
+
+    plot_states_actions_distribution(
+        states=all_states, actions=all_actions, map_size=map_size
+    )  # Sanity check
+    plot_q_values_map(qtable, env, map_size)
+
+    env.close()
 
 
 if __name__ == "__main__":
