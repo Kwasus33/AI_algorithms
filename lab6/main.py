@@ -1,7 +1,6 @@
 from Qlearning import Qlearning, EpsilonGreedy
 from visualization import (
     postprocess,
-    postprocess_single_data,
     plot_states_actions_distribution,
     plot_q_values_map,
 )
@@ -83,7 +82,7 @@ def main():
         discount_factor=0.8,
         learning_rate=0.9,
     )
-    explorer = EpsilonGreedy(epsilon=0.2)
+    explorer = EpsilonGreedy(epsilon=0.1)
 
     rewards, steps, epochs, qtables, states, actions = train_n_runs(
         epochs, n_runs, seed, learner, explorer

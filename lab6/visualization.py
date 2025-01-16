@@ -27,7 +27,7 @@ def qtable_directions_map(qtable):
     qtable_best_action = np.argmax(qtable, axis=1).reshape(4, 12)
     directions = {0: "←", 1: "↓", 2: "→", 3: "↑"}
     qtable_directions = np.empty(qtable_best_action.flatten().shape, dtype=str)
-    eps = np.finfo(float).eps  # Minimum float number on the machine
+    eps = -10
     for idx, val in enumerate(qtable_best_action.flatten()):
         if qtable_val_max.flatten()[idx] > eps:
             # Assign an arrow only if a minimal Q-value has been learned as best action
