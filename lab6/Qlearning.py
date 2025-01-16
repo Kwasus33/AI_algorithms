@@ -7,7 +7,7 @@ class Qlearning:
         self.actions_size = actions_size
         self.discount_factor = discount_factor  # gamma
         self.lr = learning_rate
-        self._reset_qtable()
+        self.reset_qtable()
 
     def update(self, state, action, reward, new_state):
         """
@@ -24,7 +24,7 @@ class Qlearning:
         )
         self.qtable[state, action] += self.lr * delta
 
-    def _reset_qtable(self):
+    def reset_qtable(self):
         self.qtable = np.zeros((self.states_size, self.actions_size))
 
 
