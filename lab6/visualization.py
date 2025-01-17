@@ -4,23 +4,6 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 
-def postprocess(n_runs, episodes, rewards, steps):
-    """Convert the results of the simulation in dataframes."""
-    res = pd.DataFrame(
-        data={
-            "Episodes": np.tile(episodes, n_runs),
-            "Rewards": rewards.flatten(order="F"),
-            "Steps": steps.flatten(order="F"),
-        }
-    )
-    res["cum_rewards"] = rewards.cumsum(axis=0).flatten(order="F")
-    res["map_size"] = np.repeat(f"{4}x{12}", res.shape[0])
-
-    st = pd.DataFrame(data={"Episodes": episodes, "Steps": steps.mean(axis=1)})
-    st["map_size"] = np.repeat(f"{4}x{12}", st.shape[0])
-    return res, st
-
-
 def qtable_directions_map(qtable):
     """Get the best learned action & map it to arrows."""
     qtable_val_max = qtable.max(axis=1).reshape(4, 12)
@@ -38,7 +21,7 @@ def qtable_directions_map(qtable):
     return qtable_val_max, qtable_directions
 
 
-def plot_q_values_map(qtable, env):
+def plot_q_values_map(qtable, env, params):
     """Plot the last frame of the simulation and the policy learned."""
     qtable_val_max, qtable_directions = qtable_directions_map(qtable)
 
@@ -65,13 +48,19 @@ def plot_q_values_map(qtable, env):
         spine.set_visible(True)
         spine.set_linewidth(0.7)
         spine.set_color("black")
+
+    fig.suptitle(
+        f"Q-Learning - lr: {params.lr}, gamma: {params.gamma}, epsilon: {params.epsilon}, epochs: {params.epochs}, n_runs: {params.n_runs}",
+        fontsize=9,
+    )
+
     img_title = f"cliffWalking_q_values_{4}x{12}.png"
     dir = "plots"
     fig.savefig(f"{dir}/{img_title}", bbox_inches="tight")
     plt.show()
 
 
-def plot_states_actions_distribution(states, actions):
+def plot_states_actions_distribution(states, actions, params):
     """Plot the distributions of states and actions."""
     labels = {"UP": 0, "RIGHT": 1, "DOWN": 2, "LEFT": 3}
 
@@ -82,7 +71,30 @@ def plot_states_actions_distribution(states, actions):
     ax[1].set_xticks(list(labels.values()), labels=labels.keys())
     ax[1].set_title("Actions")
     fig.tight_layout()
+
+    fig.suptitle(
+        f"Q-Learning - lr: {params.lr}, gamma: {params.gamma}, epsilon: {params.epsilon}, epochs: {params.epochs}, n_runs: {params.n_runs}",
+        fontsize=11,
+    )
+
     img_title = f"cliffWalking_states_actions_distrib_{4}x{12}.png"
     dir = "plots"
     fig.savefig(f"{dir}/{img_title}", bbox_inches="tight")
     plt.show()
+
+
+def postprocess(n_runs, episodes, rewards, steps):
+    """Convert the results of the simulation in dataframes."""
+    res = pd.DataFrame(
+        data={
+            "Episodes": np.tile(episodes, n_runs),
+            "Rewards": rewards.flatten(order="F"),
+            "Steps": steps.flatten(order="F"),
+        }
+    )
+    res["cum_rewards"] = rewards.cumsum(axis=0).flatten(order="F")
+    res["map_size"] = np.repeat(f"{4}x{12}", res.shape[0])
+
+    st = pd.DataFrame(data={"Episodes": episodes, "Steps": steps.mean(axis=1)})
+    st["map_size"] = np.repeat(f"{4}x{12}", st.shape[0])
+    return res, st

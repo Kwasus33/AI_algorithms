@@ -8,6 +8,7 @@ import gymnasium as gym
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
+import argparse
 
 
 env = gym.make("CliffWalking-v0", render_mode="rgb_array")
@@ -73,27 +74,40 @@ def train_n_runs(epochs, n_runs, seed, learner, explorer):
 
 
 def main():
-    n_runs = 5
-    epochs = 1000
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--n_runs", type=int, required=True)
+    parser.add_argument("--epochs", type=int, required=True)
+    parser.add_argument("--gamma", type=float, required=True)
+    parser.add_argument("--lr", type=float, required=True)
+    parser.add_argument("--epsilon", type=float, required=True)
+
+    args = parser.parse_args()
+
     seed = np.random.seed()
     learner = Qlearning(
         states_size=STATES_SIZE,
         actions_size=ACTIONS_SIZE,
-        discount_factor=0.8,
-        learning_rate=0.9,
+        discount_factor=args.gamma,
+        learning_rate=args.lr,
     )
-    explorer = EpsilonGreedy(epsilon=0.1)
+    explorer = EpsilonGreedy(epsilon=args.epsilon)
 
     rewards, steps, epochs, qtables, states, actions = train_n_runs(
-        epochs, n_runs, seed, learner, explorer
+        args.epochs, args.n_runs, seed, learner, explorer
     )
 
     # only transforms data into df
-    # results, steps = postprocess(n_runs, epochs, rewards, steps)
+    results, steps = postprocess(args.n_runs, epochs, rewards, steps)
 
     qtable = qtables.mean(axis=0)  # Average the Q-table between runs
-    plot_states_actions_distribution(states=states, actions=actions)  # Sanity check
-    plot_q_values_map(qtable, env)
+    plot_states_actions_distribution(
+        states=states, actions=actions, params=args
+    )  # Sanity check
+    plot_q_values_map(qtable=qtable, env=env, params=args)
+
+    print(f"{qtable}\n\n\n")
+    print(results)
 
     env.close()
 
