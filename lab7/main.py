@@ -1,9 +1,10 @@
 import kagglehub
 import pandas as pd
 import os
-import pomegranate
+import bnlearn as bn
+from pomegranate.bayesian_network import BayesianNetwork
 
-# import bnlearn
+from utils import plot_graph_pomegranate, generate_data_pomegranate
 
 
 def load_data(file_path, columns):
@@ -12,26 +13,33 @@ def load_data(file_path, columns):
         file_path, usecols=columns, low_memory=False
     )  # low_memory=false cause Dtypes are mixed
 
-    # crimes_df = crimes_df[
-    #     ~crimes_df.isin(["Unknown"]).any(
-    #         axis=1
-    #     )  # takes only lines where Uknown doesn't appear in any cell
-    # ]
-    # crimes_df.dropna(inplace=True)
-
     crimes_df = crimes_df.replace("Unknown", pd.NA).dropna()
 
     return crimes_df
 
 
-def net_learn(crimes_df, states):
-    net = pomegranate.BayesianNetwork.from_samples(
-        crimes_df, state_names=states, algorithm="exact"
-    )
+# def net_learn_pomegranate(crimes_df, states):
+#     data = crimes_df.to_dict(orient="records")
+#     net = BayesianNetwork.from_samples(data)
+#     return net
+
+
+def net_learn_bn(crimes_df, states):
+    net = bn.structure_learning.fit(crimes_df, methodtype="hc")
+    net = bn.parameter_learning.fit(net, crimes_df)
     return net
 
 
+def generate_data_bn(model, observations):
+    predictions = bn.inference.fit(
+        model, variables=list(observations.keys()), evidence=observations
+    )
+    return predictions
+
+
 def main():
+    test_bn = False
+
     dir_path = kagglehub.dataset_download("mrayushagrawal/us-crime-dataset")
     file_path = os.path.join(dir_path, "US_Crime_DataSet.csv")
     columns = [
@@ -45,11 +53,36 @@ def main():
         "Weapon",
     ]
     crimes_df = load_data(file_path, columns)
-    model = net_learn(crimes_df, columns)
-    print(model.structure)
-    for node in model.states:
-        print(node.name)
-        print(f"{node.distribution}\n")
+
+    model = net_learn_bn(crimes_df, columns)
+    print(f"Network structure: {model['adjmat']}\n")
+    bn.plot(model, interactive=True)
+
+    for node in model["model"].states:
+        print(f"Rozkład dla {node.name}:")
+        print(node.distribution)
+
+    observations = [
+        {"Victim Sex": "male", "Victim Age": "30"},
+        {"Perpetrator Race": "black", "Weapon": "knife"},
+        {"Victim Sex": "female", "Perpetrator Age": "25"},
+    ]
+
+    for obs in observations:
+        print(f"Niepełne obserwacje: {obs}\n")
+        print(f"Otrzymane przewidywania: {generate_data_bn(model, obs)}\n")
+
+    # model = net_learn_pomegranate(crimes_df, columns)
+    # print(model.structure)
+
+    # # it returns list of tuples of distribution indexes which are parents of given distribution
+    # # while having structure like ( (), (0, 2), (3), () ) - it means there's 4 nodes/distributions,
+    # # first(id=0) and fourth(id=3) are roots, second(id=1) - (0, 2) stores indexes of parents - is child of first and third, third - (3) is child of forth - ()
+
+    # for node in model.states:
+    #     print(f"Rozkład dla {node.name}:")
+    #     print(f"{node.distribution}\n")
+    # plot_graph_pomegranate(model)
 
 
 if __name__ == "__main__":
