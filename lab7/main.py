@@ -21,11 +21,9 @@ def net_learn_bn(crimes_df):
     return net
 
 
-def generate_data_bn(model, observations):
-    predictions = bn.inference.fit(
-        model, variables=list(observations.keys()), evidence=observations
-    )
-    return predictions
+def generate_data_bn(model, predictions, observations):
+    query = bn.inference.fit(model, variables=predictions, evidence=observations)
+    return query
 
 
 def main():
@@ -35,10 +33,10 @@ def main():
     file_path = os.path.join(dir_path, "US_Crime_DataSet.csv")
     columns = [
         "Victim Sex",
-        "Victim Age",
+        # "Victim Age",
         "Victim Race",
         "Perpetrator Sex",
-        "Perpetrator Age",
+        # "Perpetrator Age",
         "Perpetrator Race",
         "Relationship",
         "Weapon",
@@ -57,17 +55,22 @@ def main():
     # while having structure like ( (), (0, 2), (3), () ) - it means there's 4 nodes/distributions,
     # first(id=0) and fourth(id=3) are roots, second(id=1) - (0, 2) stores indexes of parents - is child of first and third, third - (3) is child of forth - ()
 
-    bn.plot(model)
-
     observations = [
-        {"Victim Sex": "male", "Victim Age": "30"},
-        {"Perpetrator Race": "black", "Weapon": "knife"},
-        {"Victim Sex": "female", "Perpetrator Age": "25"},
+        {"Victim Sex": "Male", "Relationship": "Wife"},
+        {"Perpetrator Race": "Black", "Weapon": "Knife"},
+        {"Victim Sex": "Female", "Perpetrator Race": "White"},
+    ]
+    predictions = [
+        [column for column in columns if column not in obs.keys()]
+        for obs in observations
     ]
 
-    # for obs in observations:
-    #     print(f"Niepełne obserwacje: {obs}\n")
-    #     print(f"Otrzymane przewidywania: {generate_data_bn(model, obs)}\n")
+    for preds, obs in zip(predictions, observations):
+        print(f"Niepełne obserwacje: {obs}\n")
+        print(preds)
+        print(f"Otrzymane przewidywania: {generate_data_bn(model, preds, obs)}\n")
+
+    # bn.plot(model)
 
 
 if __name__ == "__main__":
