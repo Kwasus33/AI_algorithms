@@ -1,6 +1,7 @@
 import kagglehub
-import pandas as pd
 import os
+import pandas as pd
+import numpy as np
 import bnlearn as bn
 
 
@@ -33,15 +34,31 @@ def main():
     file_path = os.path.join(dir_path, "US_Crime_DataSet.csv")
     columns = [
         "Victim Sex",
-        # "Victim Age",
+        "Victim Age",
         "Victim Race",
         "Perpetrator Sex",
-        # "Perpetrator Age",
+        "Perpetrator Age",
         "Perpetrator Race",
         "Relationship",
         "Weapon",
     ]
     crimes_df = load_data(file_path, columns)
+
+    crimes_df["Victim Age"] = crimes_df["Victim Age"].astype(int)
+    crimes_df["Perpetrator Age"] = crimes_df["Perpetrator Age"].astype(int)
+
+    """ 
+    # different ways to further discretize age distribution - using those alows 
+    # not using age feature as evidence while prediciting tuple in generate_data_bn() 
+
+    crimes_df = crimes_df.iloc[: (len(crimes_df) // 3)]
+
+    crimes_df = crimes_df[
+        (crimes_df["Victim Age"] < 51) & (crimes_df["Perpetrator Age"] < 51)
+    ]
+    """
+
+    # print(crimes_df)
 
     model = net_learn_bn(crimes_df)
     print(f"Network structure: {model['adjmat']}\n")
@@ -56,21 +73,27 @@ def main():
     # first(id=0) and fourth(id=3) are roots, second(id=1) - (0, 2) stores indexes of parents - is child of first and third, third - (3) is child of forth - ()
 
     observations = [
-        {"Victim Sex": "Male", "Relationship": "Wife"},
-        {"Perpetrator Race": "Black", "Weapon": "Knife"},
-        {"Victim Sex": "Female", "Perpetrator Race": "White"},
+        {"Victim Sex": "Male", "Perpetrator Age": 30, "Relationship": "Wife"},
+        {"Victim Age": 20, "Perpetrator Race": "Black", "Weapon": "Knife"},
+        {"Victim Age": 50, "Victim Sex": "Female", "Perpetrator Race": "White"},
     ]
     predictions = [
         [column for column in columns if column not in obs.keys()]
         for obs in observations
     ]
 
-    for preds, obs in zip(predictions, observations):
-        print(f"Niepełne obserwacje: {obs}\n")
-        print(preds)
-        print(f"Otrzymane przewidywania: {generate_data_bn(model, preds, obs)}\n")
+    with open("predictions.txt", "w") as fh:
+        for preds, obs in zip(predictions, observations):
+            query = generate_data_bn(model, preds, obs)
+            predicted_index = np.random.choice(query.df.index, p=query.df["p"])
 
-    # bn.plot(model)
+            print(f"Niepełne obserwacje: {obs}\n")
+            fh.write(f"Niepełne obserwacje: {obs}\n")
+
+            print(f"Otrzymane przewidywania: {query.df.iloc[predicted_index]}\n")
+            fh.write(f"Otrzymane przewidywania: {query.df.iloc[predicted_index]}\n\n")
+
+    bn.plot(model)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,24 @@
+Niepełne obserwacje: {'Victim Sex': 'Male', 'Perpetrator Age': 30, 'Relationship': 'Wife'}
+Otrzymane przewidywania: Victim Age                34
+Victim Race            White
+Perpetrator Sex         Male
+Perpetrator Race       White
+Weapon               Shotgun
+p                   0.002509
+Name: 16797, dtype: object
+Niepełne obserwacje: {'Victim Age': 20, 'Perpetrator Race': 'Black', 'Weapon': 'Knife'}
+Otrzymane przewidywania: Victim Sex               Female
+Victim Race               Black
+Perpetrator Sex            Male
+Perpetrator Age              39
+Relationship       Acquaintance
+p                      0.000977
+Name: 9153, dtype: object
+Niepełne obserwacje: {'Victim Age': 50, 'Victim Sex': 'Female', 'Perpetrator Race': 'White'}
+Otrzymane przewidywania: Victim Race           White
+Perpetrator Sex        Male
+Perpetrator Age          69
+Relationship         Mother
+Weapon              Handgun
+p                  0.000013
+Name: 311708, dtype: object
