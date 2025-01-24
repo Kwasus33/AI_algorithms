@@ -66,7 +66,11 @@ def main():
     # model is pgmpy Bayesian Model obj (dict)
     for node in model["model"].nodes():
         print(f"Rozkład dla {node}: ")
-        print(model["model"].get_cpds(node))
+        cpd = model["model"].get_cpds(node)
+        print(cpd)
+        cpd.to_csv(f"csv/output_{node}.csv")
+        df = pd.read_csv(f"csv/output_{node}.csv")
+        df.to_excel(f"sheets/output_{node}.xlsx", index=False)
 
     # way of describing distributions connections is presenting distributions in list of tuples
     # while having structure like ( (), (0, 2), (3), () ) - it means there's 4 nodes/distributions,
