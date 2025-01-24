@@ -28,7 +28,6 @@ def generate_data_bn(model, predictions, observations):
 
 
 def main():
-    test_bn = False
 
     dir_path = kagglehub.dataset_download("mrayushagrawal/us-crime-dataset")
     file_path = os.path.join(dir_path, "US_Crime_DataSet.csv")
