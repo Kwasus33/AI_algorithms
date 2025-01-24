@@ -15,9 +15,9 @@ def load_data(file_path, columns):
     return crimes_df
 
 
-def net_learn_bn(crimes_df, states):
-    net = bn.structure_learning.fit(crimes_df, methodtype="hc")
-    net = bn.parameter_learning.fit(net, crimes_df)
+def net_learn_bn(crimes_df):
+    net_struct = bn.structure_learning.fit(crimes_df, methodtype="hc")
+    net = bn.parameter_learning.fit(net_struct, crimes_df)
     return net
 
 
@@ -45,18 +45,19 @@ def main():
     ]
     crimes_df = load_data(file_path, columns)
 
-    model = net_learn_bn(crimes_df, columns)
+    model = net_learn_bn(crimes_df)
     print(f"Network structure: {model['adjmat']}\n")
 
-    # it returns list of tuples of distribution indexes which are parents of given distribution
+    # model is pgmpy Bayesian Model obj (dict)
+    for node in model["model"].nodes():
+        print(f"Rozkład dla {node}: ")
+        print(model["model"].get_cpds(node))
+
+    # way of describing distributions connections is presenting distributions in list of tuples
     # while having structure like ( (), (0, 2), (3), () ) - it means there's 4 nodes/distributions,
     # first(id=0) and fourth(id=3) are roots, second(id=1) - (0, 2) stores indexes of parents - is child of first and third, third - (3) is child of forth - ()
 
-    bn.plot(model, interactive=True)
-
-    for node in model["model"].states:
-        print(f"Rozkład dla {node.name}:")
-        print(node.distribution)
+    bn.plot(model)
 
     observations = [
         {"Victim Sex": "male", "Victim Age": "30"},
@@ -64,9 +65,9 @@ def main():
         {"Victim Sex": "female", "Perpetrator Age": "25"},
     ]
 
-    for obs in observations:
-        print(f"Niepełne obserwacje: {obs}\n")
-        print(f"Otrzymane przewidywania: {generate_data_bn(model, obs)}\n")
+    # for obs in observations:
+    #     print(f"Niepełne obserwacje: {obs}\n")
+    #     print(f"Otrzymane przewidywania: {generate_data_bn(model, obs)}\n")
 
 
 if __name__ == "__main__":
