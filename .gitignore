@@ -4,4 +4,6 @@ __pycache__/
 /venv
 lab2/results_table.png
 lab2/tsp_route.html
-*/plots
+plots/
+sheets/
+csv/
